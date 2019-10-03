@@ -1,24 +1,29 @@
 import React from 'react';
-import logo from './logo.svg';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import Facturas from './components/facturas'
+import 'bootstrap/dist/js/bootstrap.bundle.min';
+
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className='container'>
+        <div className="col-12">
+          <div className="card">
+            <nav className="navbar navbar-light bg-primary">
+              <h3 className="navbar-text text-white" >
+                  BiGo
+              </h3>
+            </nav>
+            <h1 className="float-left">Pagar facturas</h1>
+            <Facturas/>
+          </div>
+        </div>
+      </div>
+
+      
+
     </div>
   );
 }
