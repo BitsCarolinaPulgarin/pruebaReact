@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 export default class Buscar extends Component {
 
     handleBuscar = (e) => {
-        const { buscarFactura } = this.props
+        const { filtrarFacturas } = this.props
         const celular = e.target.value
-        buscarFactura(celular)
+        filtrarFacturas(celular)
     }
 
     render() {

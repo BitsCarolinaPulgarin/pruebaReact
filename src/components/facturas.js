@@ -3,19 +3,28 @@ import facturas from '../data/facturas.json'
 import '../App.css';
 import DetailFacutra from './detalleFactura'
 import Buscar from './buscar'
+import ListaFacturas from './listaFacturas'
 
 export default class Facturas extends Component {
-
 
     constructor(props) {
         super(props);
         this.state = {
-            datos: [facturas[0]],
+            datos: [],
             current: 1,
-            facturas: facturas,
-            serchFactura: '',
-            idFactura: ''
+            facturas: [],
+            idFactura: '',
+            serchFactura: [],
+            factAxiliar:[]
         }
+    }
+
+    componentDidMount() {
+        fetch('http://localhost:8000/facturas')
+            .then(res => res.json())
+            .then(results => {
+                this.setState({ facturas: results, datos: [results[0]], serchFactura:results, factAxiliar:results })
+            })
     }
 
 
@@ -25,70 +34,48 @@ export default class Facturas extends Component {
 
     }
 
-    filtrarFacturas(celular) {
+    filtrarFacturas = (celular) => {
 
-        const datos = facturas.filter(f => f.line_number.toLowerCase().indexOf(celular.toLowerCase()) > -1);
+        const datos = this.state.serchFactura.filter(f => f.line_number.toLowerCase().indexOf(celular.toLowerCase()) > -1);
         console.log(datos)
-        this.setState({ facturas: datos, serchFactura: celular });
+        this.setState({ facturas: datos});
     }
 
-    handleBuscar = (e) => {
-        const celular = e.target.value
-        this.filtrarFacturas(celular)
-    }
 
     eliminarFactura = dato => {
 
-        var index = facturas.map(f => f.ID).indexOf(parseInt(dato));
-        this.state.facturas.splice(index, 1);
-        this.setState({ facturas: facturas, datos: facturas });
-        
-        if (facturas[0] != undefined) {
-            var x = facturas[0]['ID'];
+        var index = this.state.factAxiliar.map(f => f.ID).indexOf(parseInt(dato));
+        this.state.factAxiliar.splice(index, 1);
+        this.setState({ facturas: this.state.factAxiliar, datos: [this.state.factAxiliar[0]], serchFactura:this.state.factAxiliar });
+
+
+        if (this.state.factAxiliar[0] != null) {
+            var x = this.state.factAxiliar[0]['ID'];
             this.setState({ current: x })
         }
 
     }
 
 
-    getId = event => {
-        const id = event.currentTarget.id;
-        this.detalleFactura(id);
-    }
-
     render() {
         return (
-
             <div className='card-body'>
                 <div className="row">
                     <div className="col-5 ">
-                        <input className="form-control" type="text" placeholder="Buscar" onChange={this.handleBuscar} />
+                        <Buscar filtrarFacturas={this.filtrarFacturas} />
                         <br></br>
                         <ul className="list-group scroll">
-                            {
-                                this.state.facturas.map(fact => {
-                                    return (
-                                        <li key={fact.ID} className={`list-group-item  ${fact.ID == this.state.current ? 'active' : ''}`} id={fact.ID} onClick={this.getId}>
-                                            <div className='row'>
-                                                <div className="col">
-                                                    <span className="float-left">{'(' + fact.country_mobile_code + ') ' + fact.formatted_line_number}</span>
-                                                    <span className="float-right text-danger">{fact.invoice_status}</span>
-                                                </div>
-                                            </div>
-                                            <div className="row">
-                                                <div className="col">
-                                                    <h4 className="float-left">{fact.currency + fact.amount}</h4>
-                                                    <span className="float-right">{fact.expiration_date}</span>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    )
-                                })
-                            }
+                            <ListaFacturas listaFacturas={this.state.facturas} current={this.state.current} detalleFactura={this.detalleFactura} />
                         </ul>
                     </div>
                     <div className="col-7">
-                        <DetailFacutra detalle={this.state.datos} eliminarFactura={this.eliminarFactura} />
+                        {
+                            this.state.facturas[0] == null
+                                ? 'NO HAY FACTURAS PARA PAGAR'
+                                : <DetailFacutra detalle={this.state.datos} eliminarFactura={this.eliminarFactura} />
+
+                        }
+
                     </div>
                 </div>
             </div>
